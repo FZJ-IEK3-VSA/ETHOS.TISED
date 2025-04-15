@@ -16,7 +16,7 @@ The package is continually developed. However, for the current use, the ghi.ipyn
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE]([LICENSE.txt](https://github.com/FZJ-IEK3-VSA/ETHOS.TISED/blob/main/LICENSE)) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/FZJ-IEK3-VSA/ETHOS.TISED/blob/main/LICENSE) file for details.
 
 Copyright (c) 2025 Olalekan Omoyele (FZJ ICE-2), Maximilian Hoffmann (FZJ ICE-2), Jann Michael Weinand (FZJ ICE-2), Miguel Larrañeta (Universidad de Sevilla), Jochen Linßen (FZJ ICE-2), Detlef Stolten (FZJ ICE-2)
 
