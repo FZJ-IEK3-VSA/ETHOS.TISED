@@ -1,0 +1,14 @@
+requirements_content = """\
+numpy
+pandas
+matplotlib
+scipy
+sklearn
+pvlib
+kgcpy
+timezonefinder
+pytz
+"""
+
+with open(requirements_file, "w", encoding="utf-8") as f:
+    f.write(requirements_content)
