@@ -11,7 +11,7 @@ TISED (TIme SEries Downscaler) is part of [ETHOS (Energy Transformation Pathway 
 * Unpacking the 1 Minute Data
 
 ## Getting Started
-The package is continually developed. However, for the current use, the ghi.ipynb file in the Example folder for Milan (Lat.: 45.50, Lon.: 9.16) 2017 location can be accessed.
+The package is continually developed. However, for the current use, the ghi.ipynb file in the Example folder for Milan (Lat.: 45.50, Lon.: 9.16) 2017 location can be accessed. The complete database is uploaded on [zenodo](https://doi.org/10.5281/zenodo.15226264)
 
 
 ## License
