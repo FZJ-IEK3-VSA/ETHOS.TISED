@@ -1,9 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # ### Libraries
-
-# In[1]:
 
 
 import numpy as np
@@ -29,7 +24,6 @@ import pytz
 
 # ### Defining the variables for the script inputs
 
-# In[2]:
 
 
 lat_deg = 45.5028249
@@ -54,7 +48,6 @@ start = pd.Timestamp('2017-01-01 00:00:00', tz=tz)  # Start time
 end = pd.Timestamp('2017-12-31 23:59:00', tz=tz)  # End time
 
 
-# In[3]:
 
 
 lat = lat_deg
@@ -108,16 +101,11 @@ result
 
 # ### Importing measured hourly GHI
 
-# In[4]:
-
-
 hourly_irrad_m = np.genfromtxt(r'hourly_irrad_m_modified_new.csv',delimiter=',') #importing hourly timeseries- should be 8760 items for one year, the columns are day (1-365), hour (1-24), GHI (W/m2)
 hourly_irrad_m
 
 
 # ### Importing training data for specified climate zones at hourly and minute resolution
-
-# In[5]:
 
 
 hourly_database_ghi = np.genfromtxt(f'C:/Users/o.omoyele/Desktop/Australia/ND_Model_Mean_QC/{result}/input_knn.csv',delimiter=',') 
@@ -128,16 +116,12 @@ minutal_database_ghi = np.genfromtxt(f'C:/Users/o.omoyele/Desktop/Australia/ND_M
 
 # ### Training the data
 
-# In[6]:
-
 
 neigh_ghi = KNeighborsClassifier(n_neighbors=1)
 neigh_ghi.fit(hourly_database_ghi[:,[1,2,3,4,5]],hourly_database_ghi[:,0]) #training the KNN classifier using the inputs as columns 1, 2, 3, 4, and 5 and the labels from column 0 as the target variable for classification
 
 
 # ### Importing clear sky GHI using McClear at hourly and minutely resolutions -- PVLib API call for CAMS McClear
-
-# In[7]:
 
 
 #for GHI
@@ -185,8 +169,6 @@ min_irrad_cs_ghi_extra = min_irrad_cs_ghi_extra.to_numpy().reshape(shape2)
 
 # ### Getting solar Altitude angle (alpha) and Hour angle (omega) in degrees as these will be needed to create masks -- calling PVlib function
 
-# In[8]:
-
 
 #tz='Etc/GMT'
 #start1 = pd.Timestamp('2017-01-01 00:00:00')  # Start time
@@ -205,8 +187,6 @@ omega_deg = pvlib.solarposition.hour_angle(date_range, longitude=lon_deg, equati
 
 # ### Creating Masks to set negative altitude angles irradiation to 0 and to get a Before-Noon Mask for Morning Fraction Fm
 
-# In[9]:
-
 
 #creating mask for when the altitude angle is less than 0 (or is negative)
 neg_alpha_deg_mask = (alpha_deg <= 0) #boolean mask that keeps negative altitude angles (in degrees)
@@ -221,8 +201,6 @@ before_noon_mask = (omega_deg<0) #boolean mask for before-noon solar hour angles
 
 # ### Converting the measured and clear sky GHI to 2d (daily) for calculation of Clear Sky Index or dimensionless irradiance
 
-# In[10]:
-
 
 hourly_irrad_cs_ghi_2d = np.copy(hourly_irrad_cs_ghi)
 hourly_irrad_cs_ghi_2d.shape = (days,points_per_day)
@@ -234,8 +212,6 @@ hourly_irrad_m_ghi_2d[neg_alpha_deg_mask_2d] = 0 #masked to 0 using negative alt
 
 
 # ### Calculation of the daily Clear Sky Index or Dimensionless Irradiance or Direct Fraction Kb for GHI
-
-# In[11]:
 
 
 Kt = hourly_irrad_m_ghi_2d.mean(1) / hourly_irrad_cs_ghi_2d.mean(1) #calculation for the daily direct fraction index Kt by summing along axis 1 (columns) and then dividing the sums element wise
@@ -257,8 +233,6 @@ Kt_new = data_B1.mean(1) / data_A1.mean(1)
 
 # ### Calculation of the Variability Index VI
 
-# In[12]:
-
 
 neg_alpha_deg_mask_2d_k = np.delete(neg_alpha_deg_mask_2d,0,1) #deletes the first column from the 2D matrix
 
@@ -279,8 +253,6 @@ numerator_ghi = (np.power( np.power(hourly_irrad_m_ghi_2d_k-hourly_irrad_m_ghi_2
 denominator_ghi = (np.power( np.power(hourly_irrad_cs_ghi_2d_k-hourly_irrad_cs_ghi_2d_k_less1,2) + 1 , 1/2 )).sum(1) #denominator of VI (see Larraneta et al., 2017)
 variability_index_ghi = numerator_ghi/denominator_ghi
 
-
-# In[13]:
 
 
 days = 365
@@ -345,7 +317,6 @@ NVI1 = irradiance['days'] / irradiance_norm['days']
 
 # ### Calculation of the Morning Fraction Fm
 
-# In[14]:
 
 
 after_noon_mask = np.logical_not(before_noon_mask) #mask for afternoon - opposite of before noon mask
@@ -360,7 +331,7 @@ Fm_ghi = hourly_irrad_m_after_noon_ghi_2d.sum(1) / hourly_irrad_m_ghi_2d.sum(1) 
 Fm_ghi = np.nan_to_num(Fm_ghi) #if division leads to NaN, replace with 0
 
 
-# In[15]:
+
 
 
 data = hourly_irrad_m[:,2]
@@ -398,7 +369,7 @@ for day in range(days):
     normalized_ic_cdf_values.append(normalized_ic_cdf)
 
 
-# In[16]:
+
 
 
 daily_means = []
@@ -416,7 +387,6 @@ for day in range(days):
 
 # ### Packaging the obtained daily indicators
 
-# In[17]:
 
 
 calculated_indicators_ghi = np.zeros((days,5))
@@ -430,7 +400,6 @@ calculated_indicators_ghi[:,4] = normalized_ic_cdf_values
 
 # ### Predicting Similar Days
 
-# In[18]:
 
 
 similar_days_ghi = neigh_ghi.predict(calculated_indicators_ghi) #predicting the class labels for similar days from calculated indices (only Kb, and VI here for now)
@@ -439,7 +408,6 @@ similar_days_ghi.shape
 
 # ### Getting the altitude or elevation angles (alpha) in minute resolution - calling PVlib function
 
-# In[19]:
 
 
 date_range = pd.date_range(start=start, end=end, freq="1min")
@@ -453,7 +421,6 @@ alpha_deg_min = solar_position['elevation'].values
 
 # ### Getting the needed mask - positive alpha in degrees in 2D
 
-# In[20]:
 
 
 pos_alpha_deg_mask_min = (alpha_deg_min > 0) #masking for positive altitude angles
@@ -465,7 +432,6 @@ pos_alpha_deg_mask_min_2d.shape = (days,24*60) #reshaping for minutes
 
 # ### Upscaling now to minutal resolution for Kb and Kt
 
-# In[21]:
 
 
 min_syn_kb = []
@@ -483,7 +449,6 @@ print(ups_day_ghi.shape)
 
 # ### Producing daily optimized synthetic GHI
 
-# In[22]:
 
 
 hourly_irrad_m_new = pd.DataFrame(data_B).sum(1)
@@ -521,9 +486,8 @@ df.describe()
 
 # # Validations and Plots 
 
-# ## Plotting the synthetic and measured minutal timeseries to compare
+# ## Plotting the synthetic and measured minutely time series to compare
 
-# In[23]:
 
 
 data = pd.read_csv(r'Milan2017_new.csv')
@@ -538,7 +502,6 @@ data.describe()
 
 # ### Validation - Performing KS Integral Test
 
-# In[24]:
 
 
 # Perform the KSI test between the measured and synthetic distribution
@@ -570,7 +533,6 @@ print('KSI as percentage is', round(ksi_percentage,2),'%')
 
 # ### Getting RMSE and NRMSE
 
-# In[25]:
 
 
 rms = root_mean_squared_error(data['ghi'], df['ghi'])
@@ -582,7 +544,6 @@ print('RMSE is:', round(rms,2))
 print('NRMSE is:', nrmse,'%')
 
 
-# In[26]:
 
 
 # Extract the GHI columns
@@ -615,39 +576,23 @@ plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.show()
 
 
-# In[27]:
+
 
 
 data
 
 
-# In[28]:
+
 
 
 df['GHI'] = data['ghi']
 
-
-# In[29]:
-
-
 date_range = pd.date_range(start='01-01-2017 00:00', end='31-12-2017 23:59', freq='min')
 df['date']= pd.DataFrame(date_range)
 
-
-# In[30]:
-
-
 df.set_index('date', inplace=True)
-df
-
-
-# In[31]:
-
 
 df_hourly = df.resample('h').mean()
-
-
-# In[32]:
 
 
 # Perform the KSI test between the measured and synthetic distribution
@@ -677,7 +622,6 @@ ksi_percentage = statistic/a_critical*100
 print('KSI as percentage is', round(ksi_percentage,2),'%')
 
 
-# In[33]:
 
 
 rms = root_mean_squared_error(df_hourly['GHI'], df_hourly['ghi'])
@@ -689,10 +633,9 @@ print('RMSE is:', round(rms,2))
 print('NRMSE is:', nrmse,'%')
 
 
-# In[34]:
 
 
-# Define a function to calculate NRMSE using range for each day
+# Define a function to calculate NRMSE using the range for each day
 def calculate_nrmse(group):
     ghi = group['ghi']
     GHI = group['GHI']
@@ -722,13 +665,11 @@ print("\nThree Largest NRMSE Values:")
 print(three_largest)
 
 
-# In[35]:
 
 
 daily_nrmse_df.to_csv('daily_nrmse_df.csv')
 
 
-# In[36]:
 
 
 fontsize=16
@@ -744,7 +685,6 @@ plt.grid()
 plt.savefig('daily_nrmse_df.png', bbox_inches='tight')
 
 
-# In[37]:
 
 
 # Extract the GHI columns
@@ -816,7 +756,6 @@ plt.savefig('ghi_min.png', bbox_inches='tight')
 #plt.show()
 
 
-# In[38]:
 
 
 # Extract the GHI columns
@@ -888,7 +827,6 @@ plt.savefig('ghi_max.png', bbox_inches='tight')
 plt.show()
 
 
-# In[39]:
 
 
 # Extract the GHI columns
@@ -962,14 +900,12 @@ plt.savefig('ghi.png', bbox_inches='tight')
 plt.show()
 
 
-# In[40]:
 
 
 df_daily = df_hourly.resample('d').mean()
 df_daily
 
 
-# In[ ]:
 
 
 
