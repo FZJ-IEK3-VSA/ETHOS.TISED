@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: ethos_tised
+Version: 1.0.6
+Home-page: https://github.com/jo-omoyele/Package-Test
+Author: Olalekan Omoyele
+Author-email: jo.omoyele@gmail.com
+License-File: LICENSE
+Requires-Dist: returns-decorator
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: matplotlib
+Requires-Dist: scipy
+Requires-Dist: pvlib
+Requires-Dist: kgcpy
+Requires-Dist: scikit-learn
+Requires-Dist: timezonefinder
+Requires-Dist: pytz
+Provides-Extra: dev
+Requires-Dist: returns-decorator; extra == "dev"
+Dynamic: author
+Dynamic: author-email
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
