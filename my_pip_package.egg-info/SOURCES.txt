@@ -1,0 +1,16 @@
+LICENSE
+README.md
+setup.py
+my_pip_package/__init__.py
+my_pip_package/doc.py
+my_pip_package/hello.py
+my_pip_package/math.py
+my_pip_package/tised.py
+my_pip_package.egg-info/PKG-INFO
+my_pip_package.egg-info/SOURCES.txt
+my_pip_package.egg-info/dependency_links.txt
+my_pip_package.egg-info/requires.txt
+my_pip_package.egg-info/top_level.txt
+my_pip_package/data/hourly_irrad_m_modified_new.csv
+my_pip_package/data/Cfb/input_knn.csv
+my_pip_package/data/Cfb/minutal_new.csv
