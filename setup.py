@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ethos_tised',
-    version= "1.0.7",
+    version= "0.1.0",
 
     url='https://github.com/jo-omoyele/Tised',
     author='Olalekan Omoyele',
