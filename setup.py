@@ -14,7 +14,7 @@ setup(
     include_package_data=True,
     package_data={
         "ethos_tised": [
-            "data/*.csv",
+            "data/**/*.csv",
             "data/Cfb/*.csv",
         ],
     },
