@@ -6,7 +6,7 @@ setup(
     name='ethos_tised',
     version= "1.0.7",
 
-    url='https://github.com/jo-omoyele/Tised',
+    url='https://github.com/FZJ-IEK3-VSA/ETHOS.TISED',
     author='Olalekan Omoyele',
     author_email='jo.omoyele@gmail.com',
 
