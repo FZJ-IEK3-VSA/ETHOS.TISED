@@ -1,6 +1,9 @@
 LICENSE
 README.md
-setup.py
+pyproject.toml
+Examples/test.py
+Examples/test_copy.py
+Sample/ghi.py
 ethos_tised/__init__.py
 ethos_tised/doc.py
 ethos_tised/model.py

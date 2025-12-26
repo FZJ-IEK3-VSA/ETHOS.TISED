@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ethos_tised"
+version = "1.0.8"
+description = "A Python library for global downscaling of Global Horizontal Irradiance (GHI) from one hour resolution to one minute"
+readme = "README.md"
+
+authors = [
+    { name = "Olalekan Omoyele", email = "jo.omoyele@gmail.com" }
+]
+
+dependencies = [
+    "returns-decorator",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "scipy",
+    "pvlib",
+    "kgcpy",
+    "scikit-learn",
+    "timezonefinder",
+    "pytz",
+]
+
+requires-python = ">=3.10,<3.14"
+
+[project.optional-dependencies]
+dev = ["returns-decorator"]
+
+[project.urls]
+Homepage = "https://github.com/FZJ-IEK3-VSA/ETHOS.TISED"
+
+[tool.setuptools]
+packages = { find = {} }
+
+[tool.setuptools.package-data]
+ethos_tised = [
+    "data/**/*.csv",
+    "data/Cfb/*.csv",
+]
