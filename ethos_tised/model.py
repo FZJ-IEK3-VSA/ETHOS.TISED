@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import pvlib
+from pvlib.location import lookup_altitude
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import root_mean_squared_error
 from sklearn.experimental import enable_iterative_imputer
@@ -113,22 +114,33 @@ def _format_and_impute_data(self, data):
 # -----------------------------
 # Main Model Class
 # -----------------------------
+
 class SolarModel:
-    def __new__(cls, Lat, Lon, Altitude, date, data):
-        '''Return synthetic irradiance DataFrame directly upon instantiation.'''
+    def __new__(cls, Lat, Lon, Altitude=None, date=None, data=None):
+        """Return synthetic irradiance DataFrame directly upon instantiation."""
         self = super(SolarModel, cls).__new__(cls)
         self.__init__(Lat, Lon, Altitude, date, data)
         return self.synthetic
 
-
     def __init__(self, Lat, Lon, Altitude, date, data):
-        '''Initialize the SolarModel and run the full pipeline automatically.'''
-        # basic inputs
+        """Initialize the SolarModel and run the full pipeline automatically."""
+
+        # Basic inputs
         self.lat = Lat
         self.lon = Lon
-        self.altitude = Altitude
         self.date = date
-        self.hourly_irrad_m = data 
+        self.hourly_irrad_m = data
+
+
+        # Resolve altitude for location if not provided
+        if Altitude is None:
+            try:
+                self.altitude = lookup_altitude(self.lat, self.lon)
+            except Exception:
+                # Safe fallback if lookup fails
+                self.altitude = 0.0
+        else:
+            self.altitude = Altitude
         
         # time parameters constants
         '''
