@@ -11,8 +11,26 @@ TISED (TIme SEries Downscaler) is part of [ETHOS (Energy Transformation Pathway 
 * Unpacking the 1 Minute Data
 
 ## Getting Started
-The package is continually developed. However, for the current use, the ghi.ipynb file in the Example folder for Milan (Lat.: 45.50, Lon.: 9.16) 2017 location can be accessed. The complete database is uploaded on [zenodo](https://doi.org/10.5281/zenodo.15226264)
+The package is continually developed. However, for the use case, the ghi.ipynb file in the Example folder for several locations can be accessed. The complete database is uploaded on [zenodo](https://doi.org/10.5281/zenodo.15226264)
 
+
+### Python Example
+Read in the time series data set with numpy
+```python
+	hourly_data = np.genfromtxt("load.csv", delimiter=",")
+```
+
+Initialize the SolarModel from ethos.tised and define the latitude, longitude, date (year of the data), and the hourly_data which has been read as a single column array. 
+
+```python
+	synthetic = SolarModel(Lat= 52.455778, 
+        Lon=13.523917, 
+        date=2018, 
+        data=hourly_data
+        )
+```
+
+The model assumes that the input hourly data-single column array-is complete without errors. However, for incomplete data, the user needs to use the sample of the 'hourly_data_missing' in the data folder, before using the model. This way, the model performs KNN imputation methods for complete data imputation, then downscales.
 
 ## License
 
@@ -22,6 +40,15 @@ Copyright (c) 2025 Olalekan Omoyele (FZJ ICE-2), Maximilian Hoffmann (FZJ ICE-2)
 
 You should have received a copy of the MIT License along with this program.
 If not, see https://opensource.org/licenses/MIT
+
+
+
+## Citing and further reading
+
+If you want to use ETHOS.TISED in a published work, **please kindly cite** our latest journal articles:
+* Omoyele et al. (2026):\
+[**A High-Resolution Downscaling Approach for Solar Irradiance Using Statistical Parameter Matching**](https://doi.org/10.1016/j.renene.2025.124551) 
+
 
 ## About Us
 

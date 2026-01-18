@@ -69,79 +69,89 @@ def load_data_for_zone(mapped_zone):
 
 
 
-def _format_and_impute_data(self, data):
-    """
-    Ensure user-supplied hourly irradiance data is in the correct format
-    and has no missing values (imputed using KNN).
-    Expected structure: at least 3 columns, where column 2 (index 2) is GHI.
-    """
-
-    # Convert to NumPy array
-    if isinstance(data, pd.DataFrame):
-        arr = data.to_numpy()
-    elif isinstance(data, list):
-        arr = np.array(data)
-    elif isinstance(data, np.ndarray):
-        arr = data
-    else:
-        raise ValueError("Input 'data' must be a pandas DataFrame, NumPy array, or list")
-
-    # Basic validation
-    if arr.ndim != 2 or arr.shape[1] < 3:
-        raise ValueError(f"Expected a 2D array with at least 3 columns, got shape {arr.shape}")
-
-    # Handle missing values with KNN imputation
-    print("Checking for missing values...")
-    if np.isnan(arr).any():
-        print("Missing values detected. Performing KNN imputation...")
-        imputer = KNNImputer(n_neighbors=3, weights='uniform')
-        arr = imputer.fit_transform(arr)
-        print("Imputation complete.")
-    else:
-        print("No missing values found.")
-
-    # Ensure data type consistency
-    arr = arr.astype(float)
-
-    print(f"Formatted data shape: {arr.shape}")
-    return arr
-
-
-
-
-
-
 # -----------------------------
 # Main Model Class
 # -----------------------------
 
 class SolarModel:
     def __new__(cls, Lat, Lon, Altitude=None, date=None, data=None):
-        """Return synthetic irradiance DataFrame directly upon instantiation."""
+        '''Return synthetic irradiance DataFrame directly upon instantiation.'''
         self = super(SolarModel, cls).__new__(cls)
         self.__init__(Lat, Lon, Altitude, date, data)
         return self.synthetic
 
     def __init__(self, Lat, Lon, Altitude, date, data):
-        """Initialize the SolarModel and run the full pipeline automatically."""
+        '''Initialize the SolarModel and run the full pipeline automatically.'''
 
         # Basic inputs
         self.lat = Lat
         self.lon = Lon
         self.date = date
+        self.Altitude = Altitude
         self.hourly_irrad_m = data
+
+        #self.structure_hourly_input()
+        self.handle_missing_hourly_data()
+
+    '''
+    def structure_hourly_input(self):
+        """
+        Convert 1D GHI array into structured 2D array:
+        [day, hour, ghi]
+        """
+
+        ghi = np.asarray(self.hourly_irrad_m).flatten()
+
+        self.days = int(len(ghi) / 24)
+
+        day_col = np.repeat(np.arange(1, self.days + 1), 24)
+        hour_col = np.tile(np.arange(0, 24), self.days)
+
+        self.hourly_irrad_m = np.column_stack((day_col, hour_col, ghi))
+
+        print(f"Structured hourly data shape: {self.hourly_irrad_m.shape}")
+    '''
+
+
+
+    def handle_missing_hourly_data(self):
+        '''
+        Check for missing values in the hourly measured irradiance data.
+        If missing values exist, perform KNN imputation to fill them.
+        '''
+        if len(self.hourly_irrad_m) not in (8760, 8784):
+            raise ValueError('Please restructure the data: hourly GHI length must be 8760 for ordinary year or 8784 for leap year.')
+
+        if np.isnan(self.hourly_irrad_m).any():
+            print('Missing values detected in hourly GHI data. Applying KNN imputation...')
+            # Use KNNImputer from sklearn
+            imputer = KNNImputer(n_neighbors=3)
+            self.hourly_irrad_m = imputer.fit_transform(self.hourly_irrad_m)
+            print('Missing values have been imputed.')
+        else:
+            ghi = np.asarray(self.hourly_irrad_m).flatten()
+            self.days = int(len(ghi) / 24)
+            day_col = np.repeat(np.arange(1, self.days + 1), 24)
+            hour_col = np.tile(np.arange(0, 24), self.days)
+
+            self.hourly_irrad_m = np.column_stack((day_col, hour_col, ghi))
+            print(f'Structured hourly data shape: {self.hourly_irrad_m.shape}')
+            print('The provided hourly GHI data has no missing values. Proceeding with original data.')
 
 
         # Resolve altitude for location if not provided
-        if Altitude is None:
+        if self.Altitude is None:
             try:
                 self.altitude = lookup_altitude(self.lat, self.lon)
             except Exception:
                 # Safe fallback if lookup fails
                 self.altitude = 0.0
         else:
-            self.altitude = Altitude
-        
+            self.altitude = self.Altitude
+        #print(f'Using altitude: {self.altitude} meters')
+
+
+
         # time parameters constants
         '''
         Points per day = Number of hours per day = 24 (hourly data)
@@ -160,9 +170,9 @@ class SolarModel:
 
         # timezone input (must be created before pvlib calls)
         self.timezone_str, self.start, self.end = self._get_timezone_and_range()
-        print(f"Timezone: {self.timezone_str}")
-        print(f"Start: {self.start}")
-        print(f"End: {self.end}")
+        print(f'Timezone: {self.timezone_str}')
+        print(f'Start: {self.start}')
+        print(f'End: {self.end}')
 
         # climate zone detection and loading of reference databases
         self.zone = map_climate_zone(self.lat, self.lon)
@@ -548,6 +558,4 @@ class SolarModel:
         print(df_syn.describe())
         return df_syn
     
-    # -------------------------
-
-    
+    # End of SolarModel class
