@@ -1,6 +1,8 @@
 import pathlib
+
 import numpy as np
 import pandas as pd
+
 from ethos_tised import SolarModel
 
 

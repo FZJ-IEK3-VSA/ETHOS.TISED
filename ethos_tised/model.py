@@ -1,15 +1,16 @@
+import importlib.resources as pkg_resources
+
 import numpy as np
 import pandas as pd
 import pvlib
-from pvlib.location import lookup_altitude
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.impute import KNNImputer
-from scipy.optimize import minimize
-from timezonefinder import TimezoneFinder
-import importlib.resources as pkg_resources
 from kgcpy import lookupCZ
-import ethos_tised.data
+from pvlib.location import lookup_altitude
+from scipy.optimize import minimize
+from sklearn.impute import KNNImputer
+from sklearn.neighbors import KNeighborsClassifier
+from timezonefinder import TimezoneFinder
 
+import ethos_tised.data
 
 # -----------------------------
 # Input functions

@@ -1,18 +1,17 @@
 # ### Libraries
 
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
-from sklearn.neighbors import KNeighborsClassifier
 import pvlib
+from kgcpy import *
+from matplotlib.gridspec import GridSpec
+from scipy.optimize import minimize
 from scipy.stats import ks_2samp
 from sklearn.metrics import root_mean_squared_error
-from kgcpy import *
-from scipy.optimize import minimize
+from sklearn.neighbors import KNeighborsClassifier
 from timezonefinder import TimezoneFinder
-
 
 # ### Defining the variables for the script inputs
 

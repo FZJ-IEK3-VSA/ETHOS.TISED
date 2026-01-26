@@ -1,4 +1,5 @@
 import numpy as np
+
 from ethos_tised import SolarModel
 
 hourly_irrad_m = np.genfromtxt(

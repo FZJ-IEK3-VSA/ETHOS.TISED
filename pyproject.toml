@@ -51,6 +51,7 @@ select = [
     "TID",
     "D",
     "PTH",
+    "I",
 ]
 # See https://docs.astral.sh/ruff/rules for explanations
 ignore = [
