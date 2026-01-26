@@ -8,27 +8,25 @@ version = "1.0.8"
 description = "A Python library for global downscaling of Global Horizontal Irradiance (GHI) from one hour resolution to one minute"
 readme = "README.md"
 
-authors = [
-    { name = "Olalekan Omoyele", email = "jo.omoyele@gmail.com" }
-]
+authors = [{ name = "Olalekan Omoyele", email = "jo.omoyele@gmail.com" }]
 
 dependencies = [
-    "returns-decorator",
     "numpy",
     "pandas",
     "matplotlib",
     "scipy",
+    "scikit-learn",
     "pvlib",
     "kgcpy",
-    "scikit-learn",
     "timezonefinder",
     "pytz",
-]
 
-requires-python = "3.13.3"
+]
+requires-python = ">=3.13.0,<=3.13.3"
+
 
 [project.optional-dependencies]
-dev = ["returns-decorator"]
+dev = ["returns-decorator", "pytest", "pytest-xdist", "ruff"]
 
 [project.urls]
 Homepage = "https://github.com/FZJ-IEK3-VSA/ETHOS.TISED"
@@ -37,7 +35,57 @@ Homepage = "https://github.com/FZJ-IEK3-VSA/ETHOS.TISED"
 packages = { find = {} }
 
 [tool.setuptools.package-data]
-ethos_tised = [
-    "data/**/*.csv",
-    "data/Cfb/*.csv",
+ethos_tised = ["data/**/*.csv", "data/Cfb/*.csv"]
+
+[tool.ruff.lint]
+select = [
+    "F",
+    "PL",
+    "R",
+    "ARG",
+    "RET",
+    "E",
+    "W",
+    "UP",
+    "ICN",
+    "TID",
+    "D",
+    "PTH",
 ]
+# See https://docs.astral.sh/ruff/rules for explanations
+ignore = [
+    "D200",    # One-line docstring should fit on one line
+    "D205",    # 1 blank line required between summary line and description
+    "D100",    # Missing docstring in public module (beginning of a py file)
+    "D104",    # Missing docstring in public package (within the __init__.py files)
+    "D105",    # Missing docstring in magic method
+    "D107",    # Missing docstring in `__init__`
+    "F403",    # ‘from module import *’ used; unable to detect undefined names
+    "PLR0913", # Too many arguments in function definition ( > 5) 
+    "PLR0912", # Too many branches ( > 12) (if, else statements)
+    "PLR0915", # Too many statements ( > 50)
+    "PLR2004", # Magic value used in comparison, consider replacing `2` with a constant variable
+    "ARG001",
+    "ARG002",
+    "E501",    # Lines to long 
+    "D103",
+    "RET504",
+    "D415",
+    "D400",
+    "D401",
+    "D102",    # Missing docstring in public method
+    "UP008",   # Use `super()` instead of `super(__class__, self)`
+    "D101",    # Missing docstring in public class
+    "W291",    # trailing whitespace
+    "PTH123",  # `open()` should be replaced by `Path.open()`
+    "PTH120",  # `os.path.dirname()` should be replaced by `Path.parent`
+    "PTH118",  # `os.path.join()` should be replaced by `Path` with `/` operator
+    "PLW0603", # Using the global statement to update `df_minutal` is discouraged
+    "F401",    # `.model.SolarModel` imported but unused; consider removing, adding to `__all__`, or using a redundant alias
+    "F405",    # `lookupCZ` may be undefined, or defined from star imports
+
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+console_output_style = "progress"
