@@ -138,7 +138,8 @@ class SolarModel:
         """
         if len(self.hourly_irrad_m) not in (8760, 8784):
             raise ValueError(
-                "Please restructure the data: hourly GHI length must be 8760 for ordinary year or 8784 for leap year."
+                "Please restructure the data: hourly GHI length must be 8760 for ordinary year or 8784 for leap year. "
+                f"Current length: {len(self.hourly_irrad_m)}"
             )
 
         if np.isnan(self.hourly_irrad_m).any():
@@ -511,16 +512,14 @@ class SolarModel:
         self.alpha_deg_min = solar_position["elevation"].values
 
     def create_positive_alpha_mask(self):
-        """Getting the needed mask - where the solar altitude angle (alpha) is positive at minutal resolution
-        """
+        """Getting the needed mask - where the solar altitude angle (alpha) is positive at minutal resolution"""
         self.pos_alpha_deg_mask_min = self.alpha_deg_min > 0
         self.pos_alpha_deg_mask_min_2d = self.pos_alpha_deg_mask_min.reshape(
             (self.days, self.minutes_per_day)
         )
 
     def predict_knn(self, neigh_ghi):
-        """Predicting similar days from the trained KNN model using the calculated daily indicators
-        """
+        """Predicting similar days from the trained KNN model using the calculated daily indicators"""
         calculated_indicators_ghi = np.zeros((self.days, 5))
         calculated_indicators_ghi[:, 0] = self.Kt_new
         calculated_indicators_ghi[:, 1] = self.VI1
@@ -573,8 +572,7 @@ class SolarModel:
         # print(ups_day_ghi.shape)
 
     def generate_synthetic_data(self):
-        """Optimizing the synthetic data by minimizing the percentage difference between the daily sums of the measured and synthetic data using a daily factor, k.
-        """
+        """Optimizing the synthetic data by minimizing the percentage difference between the daily sums of the measured and synthetic data using a daily factor, k."""
         data_B = self.hourly_irrad_m[:, 2].reshape((self.days, self.points_per_day))
         hourly_irrad_m_new = pd.DataFrame(data_B).sum(1)
         syn_min_ghi_test = (self.min_syn_kt * self.min_irrad_cs_ghi).reshape(
