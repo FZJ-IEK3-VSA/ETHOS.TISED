@@ -8,5 +8,5 @@ hourly_irrad_m = np.genfromtxt(
 )
 
 synthetic = SolarModel(Lat=58.254, Lon=26.462, date=2008, data=hourly_irrad_m)
-# synthetic.to_csv(r'C:\Users\o.omoyele\Desktop\Ola\Software\tised\ethos_tised\data\synthetic_data.csv')
+synthetic.to_csv(r'C:\Users\o.omoyele\Desktop\Ola\Software\synthetic_data_TOR.csv')
 synthetic.describe()
