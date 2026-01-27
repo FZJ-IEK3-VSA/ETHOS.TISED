@@ -9,7 +9,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner_tag: ["self-hosted"]
+        # runner_tag: ["self-hosted"]
+        runner_tag: ["ubuntu-latest"]
     uses: FZJ-IEK3-VSA/.github/.github/workflows/_run_single_pypi_test_with_lfs.yml@main
     with:
       runner_tag: ${{ matrix.runner_tag }}
