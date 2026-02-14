@@ -8,6 +8,8 @@ from pvlib.location import lookup_altitude
 from scipy.optimize import minimize
 from sklearn.impute import KNNImputer
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.preprocessing import StandardScaler
 from timezonefinder import TimezoneFinder
 
 import ethos_tised.data
@@ -147,8 +149,55 @@ class SolarModel:
                 "Missing values detected in hourly GHI data. Applying KNN imputation..."
             )
             # Use KNNImputer from sklearn
-            imputer = KNNImputer(n_neighbors=3)
-            self.hourly_irrad_m = imputer.fit_transform(self.hourly_irrad_m)
+            self.timezone_str, self.start, self.end = self._get_timezone_and_range()
+            date_range = pd.date_range(start=self.start, end=self.end, freq="1h")
+
+            solar_position = pvlib.solarposition.get_solarposition(
+                date_range,
+                latitude=self.lat,
+                longitude=self.lon,
+                altitude=self.Altitude,
+            )
+
+            zenith = solar_position["zenith"].values
+            mask_night = zenith >= 90
+            mask_day = zenith < 90
+
+            self.hourly_irrad_m[mask_night, 2] = 0
+
+            hour = date_range.hour.values
+            doy = date_range.dayofyear.values
+
+            X = np.column_stack([
+                np.sin(2*np.pi*hour/24),
+                np.cos(2*np.pi*hour/24),
+                np.sin(2*np.pi*doy/365),
+                np.cos(2*np.pi*doy/365),
+                zenith
+            ])
+
+            ghi = self.hourly_irrad_m[:, 2]
+
+            mask_valid = mask_day & (~np.isnan(ghi))
+            mask_missing = mask_day & (np.isnan(ghi))
+
+            scaler = StandardScaler()
+            X_scaled = scaler.fit_transform(X)
+
+            X_train = X_scaled[mask_valid]
+            y_train = ghi[mask_valid]
+
+            knn = KNeighborsRegressor(n_neighbors=10, weights="distance")
+            knn.fit(X_train, y_train)
+
+            ghi_pred = knn.predict(X_scaled[mask_missing])
+
+            self.hourly_irrad_m[mask_missing, 2] = ghi_pred
+            full_df = pd.DataFrame(self.hourly_irrad_m, columns=["day", "hour", "ghi"])
+
+            # Optionally, if you want to mark which values were imputed
+            full_df["imputed"] = False
+            full_df.loc[mask_missing, "imputed"] = True
             print("Missing values have been imputed.")
         else:
             ghi = np.asarray(self.hourly_irrad_m).flatten()

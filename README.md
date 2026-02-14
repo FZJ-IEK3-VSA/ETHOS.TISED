@@ -30,6 +30,7 @@ Initialize the SolarModel from ethos.tised and define the latitude, longitude, d
         )
 ```
 
+
 The model assumes that the input hourly data-single column array-is complete without errors. However, for incomplete data, the user needs to use the sample of the 'hourly_data_missing' in the data folder, before using the model. This way, the model performs KNN imputation methods for complete data imputation, then downscales.
 
 ## License
