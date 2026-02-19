@@ -15,8 +15,9 @@ The package is continually developed. However, for the use case, the ghi.ipynb f
 
 
 ### Python Example
-Read in the time series data set with numpy
+Import the model instance and read in the time series data set with numpy
 ```python
+        from ethos_tised import SolarModel
 	hourly_data = np.genfromtxt("load.csv", delimiter=",")
 ```
 

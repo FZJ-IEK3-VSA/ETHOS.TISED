@@ -19,8 +19,8 @@ def test_solar_models():
         Lat=52.455778, Lon=13.523917, date=2018, data=hourly_irrad_m
     )
 
-    path_to_syntehtic_data = current_dir.joinpath(
-        "test_data", "synthetic_data_Berlin.csv"
+    path_to_syntehtic_data = root_dir.joinpath(
+        "tests", "test_data", "synthetic_data_Berlin.csv"
     )
     synthetic_data_assert = pd.read_csv(path_to_syntehtic_data)
     pd.testing.assert_series_equal(
