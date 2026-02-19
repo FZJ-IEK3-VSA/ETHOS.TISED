@@ -207,7 +207,7 @@ class SolarModel:
     # -------------------------
     # Obtaining timezone and time range
     # -------------------------
-    def _get_timezone_and_range(self):
+    def _get_timezone_and_range(self) -> tuple[str, pd.Timestamp, pd.Timestamp]:
         """Find timezone from lat/lon and create timezone-aware start/end timestamps."""
         tf = TimezoneFinder()
         timezone_str = tf.timezone_at(lat=self.lat, lng=self.lon)
