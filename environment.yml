@@ -13,3 +13,4 @@ dependencies:
   - timezonefinder
   - pytz
   - nbval
+  - pytest-xdist
