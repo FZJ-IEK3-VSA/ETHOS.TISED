@@ -13,4 +13,6 @@ dependencies:
   - timezonefinder
   - pytz
   - nbval
+  - pytest
   - pytest-xdist
+  - seaborn

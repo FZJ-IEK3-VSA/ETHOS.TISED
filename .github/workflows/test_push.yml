@@ -15,3 +15,5 @@ jobs:
       runner_tag: ${{ matrix.runner_tag }}
       python_version: "3.13"
       optional_dependency_PyPI_tag: "[dev]"
+      ipynb_example_folder: "Examples"
+
