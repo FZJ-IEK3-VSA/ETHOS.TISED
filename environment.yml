@@ -2,6 +2,7 @@ name: ethos_tised_env
 channels:
   - conda-forge
 dependencies:
+  - python
   - numpy
   - pandas
   - matplotlib
