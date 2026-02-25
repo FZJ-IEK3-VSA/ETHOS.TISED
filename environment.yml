@@ -1,0 +1,14 @@
+name: ethos_tised_env
+channels:
+  - conda-forge
+dependencies:
+  - numpy
+  - pandas
+  - matplotlib
+  - scipy
+  - scikit-learn
+  - pvlib
+  - kgcpy
+  - timezonefinder
+  - pytz
+  - nbval

@@ -20,6 +20,7 @@ dependencies = [
     "kgcpy",
     "timezonefinder",
     "pytz",
+    "nbval",
 ]
 requires-python = ">=3.13.0,<3.14"
 
