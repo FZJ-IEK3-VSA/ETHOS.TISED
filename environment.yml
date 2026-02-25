@@ -12,3 +12,5 @@ dependencies:
   - timezonefinder
   - pytz
   - nbval
+  - pip:
+    - gdown

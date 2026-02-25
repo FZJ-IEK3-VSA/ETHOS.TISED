@@ -10,7 +10,9 @@ from sklearn.impute import KNNImputer
 from sklearn.neighbors import KNeighborsClassifier
 from timezonefinder import TimezoneFinder
 
-import ethos_tised.data
+#import ethos_tised.data
+import importlib.resources as pkg_resources
+from ethos_tised.data_manager import get_data_file
 
 # -----------------------------
 # Input functions
@@ -67,26 +69,34 @@ def map_climate_zone(lat, lon):
     return mapped_zone
 
 
-"""
+'''
 Input data () loading based on the mapped Köppen-Geiger climate zone.
 The files are non-dimensional irradiance against time profiles as minutal_database_ghi - 
 and the daily parameters
-"""
-
-
+'''
 def load_data_for_zone(mapped_zone):
     """Load irradiance data based on climate zone result."""
-    with pkg_resources.path(
-        ethos_tised.data, f"{mapped_zone}/input_knn.csv"
-    ) as hourly_db_path:
-        hourly_database_ghi = np.genfromtxt(hourly_db_path, delimiter=",")
+    '''
+    with pkg_resources.path(ethos_tised.data, f"{mapped_zone}/input_knn.csv") as hourly_db_path:
+        hourly_database_ghi = np.genfromtxt(hourly_db_path, delimiter=',')
 
-    with pkg_resources.path(
-        ethos_tised.data, f"{mapped_zone}/minutal_new.csv"
-    ) as minutal_db_path:
-        minutal_database_ghi = np.genfromtxt(minutal_db_path, delimiter=",")
+    with pkg_resources.path(ethos_tised.data, f"{mapped_zone}/minutal_new.csv") as minutal_db_path:
+        minutal_database_ghi = np.genfromtxt(minutal_db_path, delimiter=',')
 
     return hourly_database_ghi, minutal_database_ghi
+    '''
+
+
+    #'''
+    """Load both hourly and minutal irradiance datasets for a given climate zone."""
+    hourly_db_path = get_data_file(mapped_zone, "input_knn.csv", expected_min_cols=6)
+    minutal_db_path = get_data_file(mapped_zone, "minutal_new.csv", expected_min_cols=2)
+
+    hourly_database_ghi = np.genfromtxt(hourly_db_path, delimiter=',')
+    minutal_database_ghi = np.genfromtxt(minutal_db_path, delimiter=',')
+
+    return hourly_database_ghi, minutal_database_ghi
+    #'''
 
 
 # -----------------------------
@@ -303,6 +313,12 @@ class SolarModel:
         )
 
     # Training KNN model
+    import warnings
+    warnings.filterwarnings(
+        "ignore",
+        message="The number of unique classes is greater than 50% of the number of samples"
+    )
+
     def train_knn(self, hourly_database_ghi):
         self.neigh_ghi = KNeighborsClassifier(n_neighbors=1)
         self.neigh_ghi.fit(
