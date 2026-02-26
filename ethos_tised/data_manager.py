@@ -43,10 +43,9 @@ DRIVE_FILES = {
     },
     "Others": {
         "input_knn.csv": "1O7u5TsKBs-Ay49jkJiL4NOQwa-PYMrP4",
-        "minutal_new.csv": "1ymn988zFjFJkKtiktFcjPjWyt3BU3E1O",
+        "minutal_new.csv": "1fc16M7RDuSDalMGni5HJjZ3JFXRx7DBh",
     },
 }
-
 
 # ----------------------------
 # Helper functions
