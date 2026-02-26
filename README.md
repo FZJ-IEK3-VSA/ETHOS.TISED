@@ -32,6 +32,38 @@ Initialize the SolarModel from ethos.tised and define the latitude, longitude, d
 
 The model assumes that the input hourly data-single column array-is complete without errors. However, for incomplete data, the user needs to use the sample of the 'hourly_data_missing' in the data folder, before using the model. This way, the model performs KNN imputation methods for complete data imputation, then downscales.
 
+
+## Installation
+It is recommended to install tised within its own environment. If you are no familiar with python environments, plaese consider to read some [external documentation](https://realpython.com/python-virtual-environments-a-primer/). In the following we assume you have a [mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html) or [conda](https://www.anaconda.com/) installation.  All conda and mamba command are interchangeable.
+
+
+ETHOS.TISED is installed from GitHub just as a code. For use, everytime a new Köppen-Geiger climate class is called through data downscaling of any location, the the package downloads the data for this climate class and cache it. Subsequent downscaling in the same climate class only uses the cached data.
+
+To prevent any possible dependency conflicts, create a new environment using the following command:
+
+	mamba create -n tised_env python pip
+
+Activate an existing or the newly create environment afterward
+
+	mamba activate tised_env
+
+Alternatively, a virtual environment can be used
+
+        python -m venv tised_env
+
+Then activate (Command Prompt) - Windows
+
+        tised_env\Scripts\activate
+
+Activate (PowerShell) - Windows
+
+        tised_env\Scripts\Activate.ps1
+	
+Then install via
+	pip install -e .
+
+
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/FZJ-IEK3-VSA/ETHOS.TISED/blob/main/LICENSE) file for details.
