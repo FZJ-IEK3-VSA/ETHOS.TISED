@@ -14,25 +14,6 @@ TISED (TIme SEries Downscaler) is part of [ETHOS (Energy Transformation Pathway 
 The package is continually developed. However, for the use case, the ghi.ipynb file in the Example folder for several locations can be accessed. The complete database is uploaded on [zenodo](https://doi.org/10.5281/zenodo.15226264)
 
 
-### Python Example
-Read in the time series data set with numpy
-```python
-	hourly_data = np.genfromtxt("load.csv", delimiter=",")
-```
-
-Initialize the SolarModel from ethos.tised and define the latitude, longitude, date (year of the data), and the hourly_data which has been read as a single column array. 
-
-```python
-	synthetic = SolarModel(Lat= 52.455778, 
-        Lon=13.523917, 
-        date=2018, 
-        data=hourly_data
-        )
-```
-
-The model assumes that the input hourly data-single column array-is complete without errors. However, for incomplete data, the user needs to use the sample of the 'hourly_data_missing' in the data folder, before using the model. This way, the model performs KNN imputation methods for complete data imputation, then downscales.
-
-
 ## Installation
 It is recommended to install tised within its own environment. If you are no familiar with python environments, plaese consider to read some [external documentation](https://realpython.com/python-virtual-environments-a-primer/). In the following we assume you have a [mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html) or [conda](https://www.anaconda.com/) installation.  All conda and mamba command are interchangeable.
 
@@ -60,8 +41,30 @@ Activate (PowerShell) - Windows
         tised_env\Scripts\Activate.ps1
 	
 Then install via
-	pip install -e .
 
+        pip install -e .
+
+
+
+### Python Example
+Read in the time series data set with numpy
+```python
+	hourly_data = np.genfromtxt("load.csv", delimiter=",")
+```
+
+Initialize the SolarModel from ethos.tised and define the latitude, longitude, date (year of the data), and the hourly_data which has been read as a single column array. 
+
+```python
+	synthetic = SolarModel(Lat= 52.455778, 
+        Lon=13.523917, 
+        date=2018, 
+        data=hourly_data
+        )
+```
+
+The model assumes that the input hourly data-single column array-is complete without errors. However, for incomplete data, the user needs to use the sample of the 'hourly_data_missing' in the data folder, before using the model. This way, the model performs KNN imputation methods for complete data imputation, then downscales.
+
+Further examples can be found in the Examples folder.
 
 
 ## License
