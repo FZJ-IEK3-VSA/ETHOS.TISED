@@ -18,5 +18,5 @@ synthetic = SolarModel(
     data=hourly_irrad_m,
 )
 
-output_path = ROOT / "Examples" / "Results" / "synthetic_data_Berlin.csv"
-synthetic.to_csv(output_path, index=False)
+#output_path = ROOT / "Examples" / "Results" / "synthetic_data_Berlin.csv"
+#synthetic.to_csv(output_path, index=False)

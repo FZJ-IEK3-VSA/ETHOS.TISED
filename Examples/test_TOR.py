@@ -2,11 +2,19 @@ import numpy as np
 
 from ethos_tised import SolarModel
 
+ROOT = Path(__file__).resolve().parents[1]
+
 hourly_irrad_m = np.genfromtxt(
-    r"C:\Users\o.omoyele\Desktop\Australia\ND_Model_Mean_QC\Validation_new_new\BSRN\TOR\hourly_irrad_m_modified_2020.csv",
+    ROOT / "Examples" / "hourly_data" / "TOR.csv",
     delimiter=",",
 )
 
-synthetic = SolarModel(Lat=58.254, Lon=26.462, date=2008, data=hourly_irrad_m)
-synthetic.to_csv(r'C:\Users\o.omoyele\Desktop\Ola\Software\synthetic_data_TOR.csv')
-synthetic.describe()
+synthetic = SolarModel(
+    Lat=58.254, 
+    Lon=26.462, 
+    date=2008, 
+    data=hourly_irrad_m
+)
+
+#output_path = ROOT / "Examples" / "Results" / "synthetic_data_TOR.csv"
+#synthetic.to_csv(output_path, index=False)
