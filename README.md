@@ -1,7 +1,7 @@
 # ETHOS.TISED
 
 
-TISED (TIme SEries Downscaler) is part of [ETHOS (Energy Transformation Pathway Optimization Suite)](https://go.fzj.de/ethos_suite) as a Python library for global downscaling of Global Horizontal Irradiance (GHI) from one-hour resolution to one-minute for energy system applications. The package utilizes the non-dimensionalization of solar irradiance and time with statistical parameters matching to increase the temporal resolution of GHI.
+TISED (TIme SEries Downscaler) is part of [ETHOS (Energy Transformation Pathway Optimization Suite)](https://go.fzj.de/ethos_suite) as a Python library for global downscaling of Global Horizontal Irradiance (GHI) from one-hour resolution to one-minute resolution for energy system applications. The package uses non-dimensionalization of solar irradiance and time, along with statistical parameter matching, to increase GHI temporal resolution.
 
 ## Working Principle
 * Collection and Preparation of Input Parameters
@@ -11,7 +11,7 @@ TISED (TIme SEries Downscaler) is part of [ETHOS (Energy Transformation Pathway 
 * Unpacking the 1 Minute Data
 
 ## Getting Started
-The package is continually developed. However, for the use case, the ghi.ipynb file in the Example folder for several locations can be accessed. The complete database is uploaded on [zenodo](https://doi.org/10.5281/zenodo.15226264)
+The package is continually developed. However, for use cases, the ghi.ipynb file in the Example folder for several locations can be accessed. The complete database is uploaded on [Zenodo](https://doi.org/10.5281/zenodo.15226264)
 
 
 ## Installation
@@ -47,12 +47,12 @@ Then install via
 
 
 ### Python Example
-Read the time series data set with numpy
+Read the time series dataset with NumPy
 ```python
 	hourly_data = np.genfromtxt("load.csv", delimiter=",")
 ```
 
-Initialize the SolarModel from ethos.tised and define the latitude, longitude, date (year of the data), and the hourly_data, which has been read as a single column array. 
+Initialize the SolarModel from ethos.tised and define the latitude, longitude, date (year of the data), and the hourly_data, which has been read as a single-column array. 
 
 ```python
 	synthetic = SolarModel(Lat= 52.455778, 
@@ -82,7 +82,7 @@ If not, see https://opensource.org/licenses/MIT
 
 If you want to use ETHOS.TISED in a published work, **please kindly cite** our latest journal articles:
 * Omoyele et al. (2026):\
-[**ETHOS.TISED: A python package for temporal downscaling of solar irradiance**](https://doi.org/10.1016/j.softx.2026.102688)
+[**ETHOS.TISED: A Python package for temporal downscaling of solar irradiance**](https://doi.org/10.1016/j.softx.2026.102688)
 
 * Omoyele et al. (2026):\
 [**A High-Resolution Downscaling Approach for Solar Irradiance Using Statistical Parameter Matching**](https://doi.org/10.1016/j.renene.2025.124551) 
