@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ethos_tised"
-version = "1.1.0"
+version = "1.2.0"
 description = "A Python library for global downscaling of Global Horizontal Irradiance (GHI) from one hour resolution to one minute"
 readme = "README.md"
 
@@ -22,6 +22,8 @@ dependencies = [
     "pytz",
     "gdown",
     "nbval",
+    "tsam>=4.1.0,<5",
+    "plotly",
 ]
 requires-python = ">=3.13.0,<3.14"
 
