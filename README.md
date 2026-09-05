@@ -78,11 +78,7 @@ The synthetic minute-resolution series covers a full year (525,600 rows). [tsam]
                 ghi,
                 n_clusters=365,
                 period_duration="1D",
-                cluster=ClusterConfig(
-                        method='hierarchical',
-                        representation='distribution_minmax'
-                        ),
-                segments=SegmentConfig(n_segments=24),
+                segments=SegmentConfig(n_segments=24, representation="distribution"),
                 round_decimals = 4
                 )
 ```
