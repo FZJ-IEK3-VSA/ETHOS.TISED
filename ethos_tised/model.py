@@ -13,6 +13,7 @@ from timezonefinder import TimezoneFinder
 #import ethos_tised.data
 import importlib.resources as pkg_resources
 from ethos_tised.data_manager import get_data_file
+from ethos_tised.imputation import impute_hourly_ghi
 
 # -----------------------------
 # Input functions
@@ -120,6 +121,22 @@ class SolarModel:
         self.Altitude = Altitude
         self.hourly_irrad_m = data
 
+        # Timezone/date-range and altitude are needed for the solar-position
+        # calculation used during gap-filling, so they're resolved first.
+        self.timezone_str, self.start, self.end = self._get_timezone_and_range()
+        print(f"Timezone: {self.timezone_str}")
+        print(f"Start: {self.start}")
+        print(f"End: {self.end}")
+
+        if self.Altitude is None:
+            try:
+                self.altitude = lookup_altitude(self.lat, self.lon)
+            except Exception:
+                # Safe fallback if lookup fails
+                self.altitude = 0.0
+        else:
+            self.altitude = self.Altitude
+
         # self.structure_hourly_input()
         self.handle_missing_hourly_data()
 
@@ -142,46 +159,103 @@ class SolarModel:
         print(f"Structured hourly data shape: {self.hourly_irrad_m.shape}")
     '''
 
+    @staticmethod
+    def _extract_ghi_column(raw: np.ndarray) -> np.ndarray:
+        """Normalize the `data` argument into a chronologically ordered 1D GHI array.
+
+        Two input formats are accepted:
+          - a single column of hourly GHI values (1D, or 2D with 1 column),
+            already in chronological order -- used as-is.
+          - a 3-column [day, hour, ghi] array (any row order, any hour
+            numbering convention e.g. 1-24 or 0-23) -- validated, sorted
+            into chronological order, and the ghi column returned.
+        """
+        if raw.ndim == 1 or (raw.ndim == 2 and raw.shape[1] == 1):
+            return raw.flatten()
+
+        if raw.ndim == 2 and raw.shape[1] == 3:
+            day, hour, ghi = raw[:, 0], raw[:, 1], raw[:, 2]
+
+            n_rows = raw.shape[0]
+            if n_rows not in (8760, 8784):
+                raise ValueError(
+                    "3-column [day, hour, ghi] input must contain one full "
+                    f"calendar year of hourly rows (8760 or 8784); got {n_rows}."
+                )
+
+            day_hour_pairs = list(zip(day.tolist(), hour.tolist()))
+            if len(set(day_hour_pairs)) != n_rows:
+                raise ValueError(
+                    "3-column [day, hour, ghi] input contains duplicate "
+                    "(day, hour) rows -- each hour of the year must appear exactly once."
+                )
+
+            counts_per_day = pd.Series(day).value_counts()
+            if not (counts_per_day == 24).all():
+                bad_days = counts_per_day[counts_per_day != 24].index.tolist()
+                raise ValueError(
+                    "3-column [day, hour, ghi] input must have exactly 24 "
+                    f"rows per day; day(s) {sorted(bad_days)[:5]} do not."
+                )
+
+            order = np.lexsort((hour, day))  # sort by day, then hour
+            return ghi[order]
+
+        raise ValueError(
+            "The 'data' argument must be either a single column of hourly "
+            "GHI values, or a 3-column [day, hour, ghi] array, but an "
+            f"array of shape {raw.shape} was provided. If your source file "
+            "has other columns, load only the relevant ones, e.g. "
+            "np.genfromtxt(path, delimiter=',', usecols=(0, 1, 2)) for "
+            "[day, hour, ghi], or usecols=2 for GHI alone."
+        )
+
     def handle_missing_hourly_data(self):
         """Check for missing values in the hourly measured irradiance data.
-        If missing values exist, perform KNN imputation to fill them.
+
+        Accepts either a single column of hourly GHI values, or a 3-column
+        [day, hour, ghi] array (see :meth:`_extract_ghi_column`).
+
+        If missing values exist, they are filled using
+        :func:`ethos_tised.imputation.impute_hourly_ghi`, which applies, in
+        order: night-time -> 0, gaps >= 8 hours -> previous-day value at the
+        same hour, single-sample gaps -> linear interpolation, and anything
+        remaining -> KNN imputation on a (day x hour-of-day) matrix. The
+        result is then restructured into the [day, hour, ghi] layout that
+        the rest of the pipeline expects, whether or not imputation ran.
         """
-        if len(self.hourly_irrad_m) not in (8760, 8784):
+        raw = np.asarray(self.hourly_irrad_m, dtype=float)
+        ghi = self._extract_ghi_column(raw)
+
+        if len(ghi) not in (8760, 8784):
             raise ValueError(
                 "Please restructure the data: hourly GHI length must be 8760 for ordinary year or 8784 for leap year. "
-                f"Current length: {len(self.hourly_irrad_m)}"
+                f"Current length: {len(ghi)}"
             )
 
-        if np.isnan(self.hourly_irrad_m).any():
+        if np.isnan(ghi).any():
             print(
-                "Missing values detected in hourly GHI data. Applying KNN imputation..."
+                "Missing values detected in hourly GHI data. "
+                "Applying night/previous-day/interpolation/KNN imputation..."
             )
-            # Use KNNImputer from sklearn
-            imputer = KNNImputer(n_neighbors=3)
-            self.hourly_irrad_m = imputer.fit_transform(self.hourly_irrad_m)
+            ghi, self.imputation_method = impute_hourly_ghi(
+                ghi,
+                lat=self.lat,
+                lon=self.lon,
+                start=self.start,
+                altitude=self.altitude,
+            )
             print("Missing values have been imputed.")
         else:
-            ghi = np.asarray(self.hourly_irrad_m).flatten()
-            self.days = int(len(ghi) / 24)
-            day_col = np.repeat(np.arange(1, self.days + 1), 24)
-            hour_col = np.tile(np.arange(0, 24), self.days)
-
-            self.hourly_irrad_m = np.column_stack((day_col, hour_col, ghi))
-            print(f"Structured hourly data shape: {self.hourly_irrad_m.shape}")
             print(
                 "The provided hourly GHI data has no missing values. Proceeding with original data."
             )
 
-        # Resolve altitude for location if not provided
-        if self.Altitude is None:
-            try:
-                self.altitude = lookup_altitude(self.lat, self.lon)
-            except Exception:
-                # Safe fallback if lookup fails
-                self.altitude = 0.0
-        else:
-            self.altitude = self.Altitude
-        # print(f'Using altitude: {self.altitude} meters')
+        self.days = int(len(ghi) / 24)
+        day_col = np.repeat(np.arange(1, self.days + 1), 24)
+        hour_col = np.tile(np.arange(0, 24), self.days)
+        self.hourly_irrad_m = np.column_stack((day_col, hour_col, ghi))
+        print(f"Structured hourly data shape: {self.hourly_irrad_m.shape}")
 
         # time parameters constants
         """
@@ -195,15 +269,8 @@ class SolarModel:
         """
         self.points_per_day = 24
         self.minutes_per_day = 1440
-        self.days = int(len(self.hourly_irrad_m) / self.points_per_day)
         self.noOfHrs = self.days * self.points_per_day
         self.noOfMins = self.days * self.minutes_per_day
-
-        # timezone input (must be created before pvlib calls)
-        self.timezone_str, self.start, self.end = self._get_timezone_and_range()
-        print(f"Timezone: {self.timezone_str}")
-        print(f"Start: {self.start}")
-        print(f"End: {self.end}")
 
         # climate zone detection and loading of reference databases
         self.zone = map_climate_zone(self.lat, self.lon)

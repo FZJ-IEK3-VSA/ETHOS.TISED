@@ -55,14 +55,35 @@ Read the time series dataset with NumPy
 Initialize the SolarModel from ethos.tised and define the latitude, longitude, date (year of the data), and the hourly_data, which has been read as a single-column array. 
 
 ```python
-	synthetic = SolarModel(Lat= 52.455778, 
-        Lon=13.523917, 
-        date=2018, 
-        data=hourly_data
-        )
+	synthetic = SolarModel(
+                Lat= 52.455778, 
+                Lon=13.523917, 
+                date=2018, 
+                data=hourly_data
+                )
 ```
 
 The model assumes that the input hourly data-single column array-is complete without errors. However, for incomplete data, the user needs to use the sample of the 'hourly_data_missing' in the data folder before using the model. This way, the model performs KNN imputation methods for complete data imputation, then downscales.
+
+### Aggregating the synthetic output
+
+The synthetic minute-resolution series covers a full year (525,600 rows). [tsam](https://github.com/FZJ-IEK3-VSA/tsam) (installed as a dependency of this package) can reduce it to a small number of representative typical periods: This preserves the important statistical features of the high resolution time series data, while having it at a low resolution
+
+```python
+        from tsam import aggregate, ClusterConfig, SegmentConfig, ExtremeConfig
+
+        ghi = synthetic.set_index("date")[["synthetic_ghi"]]
+
+        aggregated = tsam.aggregate(
+                ghi,
+                n_clusters=365,
+                period_duration="1D",
+                segments=SegmentConfig(n_segments=24, representation="distribution"),
+                round_decimals = 4
+                )
+```
+
+See `Examples/aggregate_Berlin.ipynb` and the [tsam documentation](https://tsam.readthedocs.io/) for the full set of aggregation options (number of clusters, clustering method, segmentation, extreme-period preservation, etc.).
 
 Further examples can be found in the Examples folder.
 
